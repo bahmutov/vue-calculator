@@ -4,11 +4,11 @@ authorTwitter: @bahmutov
 tags: vue.js, code coverage
 ---
 
-Let's take a Vue application scaffolded with Vue CLI like this [vue-calculator](https://github.com/bahmutov/vue-calculator). The application uses Babel to transpile source files, which makes it very flexible. In this blog post, I will show how to instrument the application's source code on the fly to collect code coverage information. We then will use the code coverage reports to guide end-to-end test writing.
+Let's take a Vue application scaffolded with [Vue CLI](https://cli.vuejs.org/) like this [vue-calculator](https://github.com/bahmutov/vue-calculator) app. The application uses Babel to transpile source files, which makes it very flexible. In this blog post, I will show how to instrument on the fly the application's source code to collect the code coverage information. We then will use the code coverage reports to guide the end-to-end test writing.
 
-## Instrument source code
+## The application
 
-By default, the code is transformed using the following `babel.config.js` file
+The example application was forked from [kylbutlr/vue-calculator](https://github.com/kylbutlr/vue-calculator). The code is transformed using the following `babel.config.js` file which was setup using the default Vue CLI options:
 
 ```js
 // babel.config.js
@@ -33,7 +33,11 @@ The application runs at port 8080 by default.
 
 ![Vue calculator application](./images/calculator.png)
 
-We can instrument the application code by inserting [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) into Babel config.
+Tada! You can calculate anything you want.
+
+## Instrument source code
+
+We can instrument the application code by adding the `plugins` list to the exported Babel config.The plugins should include the [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul).
 
 ```js
 // babel.config.js
@@ -47,11 +51,11 @@ module.exports = {
 }
 ```
 
-The application runs, and now we can find `window.__coverage__` object with counters for every statement, every function, and every branch for every file.
+The application runs, and now we should find the `window.__coverage__` object with counters for every statement, every function, and every branch of every file.
 
 ![Application coverage object](./images/coverage.png)
 
-Except the coverage object includes a single entry `src/main.js`, and is missing `src/App.vue` and `src/components/Calculator.vue` files.
+Except the coverage object as shown above, includes only a single entry `src/main.js`, and the coverage object is missing both `src/App.vue` and `src/components/Calculator.vue` files.
 
 Let's tell `babel-plugin-istanbul` that we want to instrument both `.js` and `.vue` files.
 
@@ -69,7 +73,7 @@ module.exports = {
 }
 ```
 
-**Tip:** we can place `istanbul` settings in a separate file `.nycrc`, or add them to `package.json`. For now, let's just keep the settings with the plugin.
+**Tip:** we can place `istanbul` settings in a separate file `.nycrc`, or add them to `package.json`. For now, let's just keep these settings together with the plugin itself.
 
 When we restart the application, we get a new `window.__coverage__` object with entries for `.js` and for `.vue` files.
 
@@ -113,20 +117,24 @@ $ NODE_ENV=test npm run serve
 
 ## End-to-end Tests
 
-Now that we have instrumented our source code, let us it to guide writing tests. I will install Cypress Test Runner plus its [code coverage plugin](https://github.com/cypress-io/code-coverage) that will convert the coverage objects into human and machine readable reports at the end of the test run. I will also install a handy utility for starting the application, running tests, and shutting down the app afterwards called [start-server-and-test](https://github.com/bahmutov/start-server-and-test).
+Now that we have instrumented our source code, let us use it to guide us in writing tests. I will install Cypress Test Runner plus its [code coverage plugin](https://github.com/cypress-io/code-coverage) that will convert the coverage objects into human and machine readable reports at the end of the test run. I will also install a handy utility called [start-server-and-test](https://github.com/bahmutov/start-server-and-test) for starting the application, running the tests, and shutting down the app afterwards.
 
 ```shell
 $ npm i -D cypress @cypress/code-coverage start-server-and-test
++ cypress@4.9.0
++ @cypress/code-coverage@3.8.1
++ start-server-and-test@1.11.0
 ```
 
-**Note:** you can install Cypress using Vue CLI plugin [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html), but I prefer to install the latest Cypress version.
+**Note:** you can install Cypress by using the official Vue CLI plugin [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html), but I prefer to install the latest Cypress version directly.
 
 In the folder `cypress` I will create two subfolders following the [code-coverage instructions](https://github.com/cypress-io/code-coverage#install)
 
 ```js
-// cypress/support/index.js
+// file cypress/support/index.js
 import '@cypress/code-coverage/support'
-// cypress/plugins/index.js
+
+// file cypress/plugins/index.js
 module.exports = (on, config) => {
   require('@cypress/code-coverage/task')(on, config)
   // IMPORTANT to return the config object
@@ -135,7 +143,7 @@ module.exports = (on, config) => {
 }
 ```
 
-Finally, in `cypress.json` file I will place the global settings like the base url:
+Finally, in `cypress.json` file I will place the global settings like the base url to use during tests:
 
 ```json
 {
@@ -281,3 +289,9 @@ Now let's run all tests again. All tests pass in less than 3 seconds
 And the tests together cover our entire code base.
 
 ![Full code coverage](./images/full-cover.png)
+
+## Conclusions
+
+- adding code instrumentation to Vue projects is simple if the project already is using Babel to transpile code. It requires adding `babel-plugin-istanbul` to the list of pipelines; this blog post showed how to instrument the source code during testing.
+- end-to-end tests are very effective at covering a lot of code because they exercise the full application.
+- the code coverage reports produced by `@cypress/code-coverage` plugin are a guide to the tests still to write
