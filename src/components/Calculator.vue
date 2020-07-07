@@ -57,6 +57,8 @@ export default {
           : "" + this.display + number;
     },
     decimal() {
+      // wrong line on purpose
+      // if (this.display.indexOf(".") === -1) {
       if (String(this.display).indexOf(".") === -1) {
         this.append(".");
       }

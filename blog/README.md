@@ -262,7 +262,21 @@ Run the test again, and wait until it hits the `debugger` keyword (keep the DevT
 
 ![Debugging decimal method](./images/debugger.png)
 
-Ohh, the `this.display` is a Number, not a String. Thus `.indexOf()` does not exist. Let's fix it.
+Ohh, the `this.display` is a Number, not a String. Thus `.indexOf()` does not exist.
+
+**Tip:** if you want Cypress tests to fail any time Vue catches an error, set the following in your code
+
+```js
+// exclude these lines from code coverage
+/* istanbul ignore next */
+if (window.Cypress) {
+  // send any errors caught by the Vue handler
+  // to the Cypress top level error handler to fail the test
+  Vue.config.errorHandler = window.top.onerror
+}
+```
+
+Let's fix the logical error in our code:
 
 ```js
 decimal() {
