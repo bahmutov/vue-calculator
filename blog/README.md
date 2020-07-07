@@ -213,6 +213,14 @@ End-to-end tests are _effective_. With a single test that loads and interacts wi
 
 The source lines highlighted in red are the lines missed by the test. We can see that we still need to write a test that clears the current number, changes the sign, sets the decimal point, multiplies, etc. But we did test typing numbers (appending) and diving numbers. The test writing thus becomes following the code coverage as a guide to writing end-to-end tests to travel to all places marked in red.
 
+```
+  Calculator
+    ✓ computes adds and divides (1031ms)
+    ✓ multiplies, resets and subtracts (755ms)
+    ✓ changes sign (323ms)
+    ✓ % operator (246ms)
+```
+
 As we write more tests we quickly gain coverage and confidence in our application. In the last test we will cover `decimal ()` method that remains uncovered still.
 
 ![Decimal method without any coverage](./images/decimal.png)
