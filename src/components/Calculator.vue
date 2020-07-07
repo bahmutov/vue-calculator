@@ -1,25 +1,25 @@
 <template>
-  <div class='calculator' onselectstart='return false'>
-    <div class='display'>{{display}}</div>
-    <div @click='clear' class='button darker'>C</div>
-    <div @click='sign' class='button darker'>+/-</div>
-    <div @click='percent' class='button darker'>%</div>
-    <div @click='divide' class='button operator'>÷</div>
-    <div @click='append(7)' class='button'>7</div>
-    <div @click='append(8)' class='button'>8</div>
-    <div @click='append(9)' class='button'>9</div>
-    <div @click='multiply' class='button operator'>x</div>
-    <div @click='append(4)' class='button'>4</div>
-    <div @click='append(5)' class='button'>5</div>
-    <div @click='append(6)' class='button'>6</div>
-    <div @click='subtract' class='button operator'>-</div>
-    <div @click='append(1)' class='button'>1</div>
-    <div @click='append(2)' class='button'>2</div>
-    <div @click='append(3)' class='button'>3</div>
-    <div @click='add' class='button operator'>+</div>
-    <div @click='append(0)' class='button zero button-bottom'>0</div>
-    <div @click='decimal' class='button darker button-bottom'>.</div>
-    <div @click='equal' class='button operator button-bottom'>=</div>
+  <div class="calculator" onselectstart="return false">
+    <div class="display">{{display}}</div>
+    <div @click="clear" class="button darker">C</div>
+    <div @click="sign" class="button darker">+/-</div>
+    <div @click="percent" class="button darker">%</div>
+    <div @click="divide" class="button operator">÷</div>
+    <div @click="append(7)" class="button">7</div>
+    <div @click="append(8)" class="button">8</div>
+    <div @click="append(9)" class="button">9</div>
+    <div @click="multiply" class="button operator">x</div>
+    <div @click="append(4)" class="button">4</div>
+    <div @click="append(5)" class="button">5</div>
+    <div @click="append(6)" class="button">6</div>
+    <div @click="subtract" class="button operator">-</div>
+    <div @click="append(1)" class="button">1</div>
+    <div @click="append(2)" class="button">2</div>
+    <div @click="append(3)" class="button">3</div>
+    <div @click="add" class="button operator">+</div>
+    <div @click="append(0)" class="button zero button-bottom">0</div>
+    <div @click="decimal" class="button darker button-bottom">.</div>
+    <div @click="equal" class="button operator button-bottom">=</div>
   </div>
 </template>
 
@@ -48,17 +48,17 @@ export default {
     },
     append(number) {
       if (this.operatorClicked === true) {
-        this.display = '';
+        this.display = "";
         this.operatorClicked = false;
       }
       this.display =
         this.display === 0
           ? (this.display = number)
-          : '' + this.display + number;
+          : "" + this.display + number;
     },
     decimal() {
-      if (this.display.indexOf('.') === -1) {
-        this.append('.');
+      if (String(this.display).indexOf(".") === -1) {
+        this.append(".");
       }
     },
     divide() {
@@ -99,7 +99,7 @@ export default {
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: minmax(10vh, auto);
   border: 5px solid #111;
-  box-shadow: -3px 3px 15px rgba(17,17,17,0.4);
+  box-shadow: -3px 3px 15px rgba(17, 17, 17, 0.4);
   line-height: 10vh;
 }
 
@@ -121,15 +121,15 @@ export default {
 
 .button {
   background: hsl(0, 0%, 80%);
-  background: linear-gradient(15deg,hsl(0, 0%, 70%) 0%, hsl(0, 0%, 80%) 100%);
+  background: linear-gradient(15deg, hsl(0, 0%, 70%) 0%, hsl(0, 0%, 80%) 100%);
   border: 1px solid #111;
   cursor: pointer;
 }
 
 .button:active {
-  outline:none;
-  border: 1px solid #000000BF; 
-  box-shadow: inset 0px 0px 5px #00000080; 
+  outline: none;
+  border: 1px solid #000000bf;
+  box-shadow: inset 0px 0px 5px #00000080;
   -moz-box-shadow: inset 0px 0px 5px #00000080;
   -webkit-box-shadow: inset 0px 0px 5px #00000080;
 }
@@ -140,7 +140,11 @@ export default {
 
 .operator {
   background: hsl(153, 48%, 49%);
-  background: linear-gradient(15deg,hsl(153, 48%, 39%) 0%, hsl(153, 48%, 49%) 100%);
+  background: linear-gradient(
+    15deg,
+    hsl(153, 48%, 39%) 0%,
+    hsl(153, 48%, 49%) 100%
+  );
 }
 
 .darker {
