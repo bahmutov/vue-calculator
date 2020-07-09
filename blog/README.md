@@ -4,11 +4,11 @@ authorTwitter: @bahmutov
 tags: vue.js, code coverage
 ---
 
-Let's take a Vue application scaffolded with [Vue CLI](https://cli.vuejs.org/) like this [vue-calculator](https://github.com/bahmutov/vue-calculator) app. The application uses Babel to transpile source files, which makes it very flexible. In this blog post, I will show how to instrument on the fly the application's source code to collect the code coverage information. We then will use the code coverage reports to guide the end-to-end test writing.
+Let's take a Vue application scaffolded with [Vue CLI](https://cli.vuejs.org/) like this [vue-calculator](https://github.com/bahmutov/vue-calculator) app. In this blog post, I will show how to instrument the application's source code to collect the code coverage information. We then will use the code coverage reports to guide the end-to-end test writing.
 
 ## The application
 
-The example application was forked from [kylbutlr/vue-calculator](https://github.com/kylbutlr/vue-calculator). The code is transformed using the following `babel.config.js` file which was setup using the default Vue CLI options:
+The example application was forked from [kylbutlr/vue-calculator](https://github.com/kylbutlr/vue-calculator) which used Vue CLI default template during scaffolding. The code is transformed using the following `babel.config.js` file:
 
 ```js
 // babel.config.js
@@ -213,13 +213,17 @@ While working with tests locally, I prefer opening the HTML coverage report
 $ open coverage/lcov-report/index.html
 ```
 
+The `index.html` is a static page that shows a table for each source folder with coverage information.
+
 ![Coverage report](./images/coverage-report.png)
+
+**Tip:** store the entire `coverage/lcov-report` folder as a test artifact on your Continuous Integration (CI) server. Then browse or download the report to see the collected code coverage after the test run.
 
 End-to-end tests are _effective_. With a single test that loads and interacts with the entire application we have covered 60% of the source code. Even better, by drilling down to the individual files, we discover in `src/components/Calculator.vue` the features we have not tested yet.
 
 ![Covered lines in Calculator.vue file](./images/covered-lines.png)
 
-The source lines highlighted in red are the lines missed by the test. We can see that we still need to write a test that clears the current number, changes the sign, sets the decimal point, multiplies, etc. But we did test typing numbers (appending) and diving numbers. The test writing thus becomes following the code coverage as a guide to writing end-to-end tests to travel to all places marked in red.
+The source lines highlighted in red are the lines missed by the test. We can see that we still need to write a test that clears the current number, changes the sign, sets the decimal point, multiplies, etc. But we did test entering and dividing numbers. The test writing thus becomes following the code coverage as a guide to writing end-to-end; add tests until you hit all lines marked in red!
 
 ```
   Calculator
@@ -229,11 +233,11 @@ The source lines highlighted in red are the lines missed by the test. We can see
     ✓ % operator (246ms)
 ```
 
-As we write more tests we quickly gain coverage and confidence in our application. In the last test we will cover `decimal ()` method that remains uncovered still.
+As we write more tests we quickly gain coverage and confidence in our application. In the last test we will cover the `decimal () { ... }` method that remained red so far.
 
 ![Decimal method without any coverage](./images/decimal.png)
 
-The test types a single digit number and clicks "." operator. The display should show "5."
+The test below types a single digit number and clicks the "." button. The display should show "5.".
 
 ```js
 it('decimal', () => {
@@ -247,7 +251,7 @@ Hmm, this is weird, the test fails.
 
 ![Decimal test fails](./images/decimal-fails.png)
 
-A power of Cypress test is that it runs in the browser. Let's debug the failing test. Put a breakpoint in the `src/components/Calculator.vue`
+A power of Cypress test is that it runs in the real browser. Let's debug the failing test. Put a breakpoint in the `src/components/Calculator.vue`
 
 ```js
 decimal() {
@@ -258,13 +262,13 @@ decimal() {
 },
 ```
 
-Run the test again, and wait until it hits the `debugger` keyword (keep the DevTools open)
+Open the DevTools in the browser and run the test again. It will run until it hits the `debugger` keyword in the application code.
 
 ![Debugging decimal method](./images/debugger.png)
 
-Ohh, the `this.display` is a Number, not a String. Thus `.indexOf()` does not exist.
+Ohh, the `this.display` is a Number, not a String. Thus `.indexOf()` does not exist and the expression `this.display.indexOf(".")` throws an error.
 
-**Tip:** if you want Cypress tests to fail any time Vue catches an error, set the following in your code
+**Tip:** if you want Cypress tests to fail any time Vue catches an error, set the following in your code application code:
 
 ```js
 // exclude these lines from code coverage
@@ -272,6 +276,7 @@ Ohh, the `this.display` is a Number, not a String. Thus `.indexOf()` does not ex
 if (window.Cypress) {
   // send any errors caught by the Vue handler
   // to the Cypress top level error handler to fail the test
+  // https://github.com/cypress-io/cypress/issues/7910
   Vue.config.errorHandler = window.top.onerror
 }
 ```
@@ -286,11 +291,22 @@ decimal() {
 },
 ```
 
-The test passes. The code coverage tells us that the "Else" path of the condition has not been taken yet.
+The test passes. Now the code coverage report tells us that the "Else" path of the condition has not been taken yet.
 
 ![Else path not taken](./images/decimal-else.png)
 
-Extend the test to cover all code paths and turn it green
+Extend the test to click the "." operator twice during the test and it will cover all code paths and turn the entire method coverage green.
+
+```js
+it('decimal', () => {
+  cy.contains('.button', '5').click()
+  cy.contains('.button', '.').click()
+  cy.contains('.display', '5.')
+  cy.log('**does not add it twice**')
+  cy.contains('.button', '.').click()
+  cy.contains('.display', '5.')
+})
+```
 
 ![Decimal test passes](./images/decimal-test-passes.png)
 
@@ -306,6 +322,9 @@ And the tests together cover our entire code base.
 
 ## Conclusions
 
-- adding code instrumentation to Vue projects is simple if the project already is using Babel to transpile code. It requires adding `babel-plugin-istanbul` to the list of pipelines; this blog post showed how to instrument the source code during testing.
+- adding code instrumentation to Vue projects is simple if the project is already using Babel to transpile the source code. By adding the `babel-plugin-istanbul` to the list of plugins you get the code coverage information under `window.__coverage__` object.
+- you probably want to only instrument the source code while running tests to avoid slowing down the production build
 - end-to-end tests are very effective at covering a lot of code because they exercise the full application.
-- the code coverage reports produced by `@cypress/code-coverage` plugin are a guide to the tests still to write
+- the code coverage reports produced by `@cypress/code-coverage` plugin can guide you in writing tests to ensure all features are tested
+
+For more information read the [Cypress code coverage guide](https://on.cypress.io/code-coverage) and [@cypress/code-coverage](https://github.com/cypress-io/code-coverage) documentation.

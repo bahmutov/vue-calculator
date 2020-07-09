@@ -8,6 +8,7 @@ Vue.config.productionTip = false
 if (window.Cypress) {
   // send any errors caught by the Vue handler
   // to the Cypress top level error handler to fail the test
+  // https://github.com/cypress-io/cypress/issues/7910
   Vue.config.errorHandler = window.top.onerror
 }
 
