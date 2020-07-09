@@ -113,28 +113,25 @@ We can start the application with instrumentation by setting the environment var
 $ NODE_ENV=test npm run serve
 ```
 
-**Tip:** for cross-platform portability use [cross-env](https://github.com/kentcdodds/cross-env) utility to set an environment variable.
+**Tip:** for cross-platform portability use the [cross-env](https://github.com/kentcdodds/cross-env) utility to set an environment variable.
 
 ## End-to-end Tests
 
-Now that we have instrumented our source code, let us use it to guide us in writing tests. I will install Cypress Test Runner plus its [code coverage plugin](https://github.com/cypress-io/code-coverage) that will convert the coverage objects into human and machine readable reports at the end of the test run. I will also install a handy utility called [start-server-and-test](https://github.com/bahmutov/start-server-and-test) for starting the application, running the tests, and shutting down the app afterwards.
+Now that we have instrumented our source code, let us use it to guide us in writing tests. I will install Cypress Test Runner using the official Vue CLI plugin [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html). Then I will install the [Cypress code coverage plugin](https://github.com/cypress-io/code-coverage) that will convert the coverage objects into human- and machine-readable reports at the end of the test run.
 
 ```shell
-$ npm i -D cypress @cypress/code-coverage start-server-and-test
-+ cypress@4.9.0
+$ vue add e2e-cypress
+$ npm i -D @cypress/code-coverage
 + @cypress/code-coverage@3.8.1
-+ start-server-and-test@1.11.0
 ```
 
-**Note:** you can install Cypress by using the official Vue CLI plugin [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html), but I prefer to install the latest Cypress version directly.
-
-In the folder `cypress` I will create two subfolders following the [code-coverage instructions](https://github.com/cypress-io/code-coverage#install)
+The [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html) has created folder `tests/e2e` where I can load the code coverage plugin from both the support and the plugins files.
 
 ```js
-// file cypress/support/index.js
+// file tests/e2e/support/index.js
 import '@cypress/code-coverage/support'
 
-// file cypress/plugins/index.js
+// file tests/e2e/plugins/index.js
 module.exports = (on, config) => {
   require('@cypress/code-coverage/task')(on, config)
   // IMPORTANT to return the config object
@@ -143,29 +140,19 @@ module.exports = (on, config) => {
 }
 ```
 
-Finally, in `cypress.json` file I will place the global settings like the base url to use during tests:
-
-```json
-{
-  "baseUrl": "http://localhost:8080"
-}
-```
-
-We can start the application with code instrumentation and open Cypress by using NPM scripts
+Let's set the environment variable `NODE_ENV=test` to the NPM script command `test:e2e` inserted into `package.json` by the [@vue/cli-plugin-e2e-cypress](https://cli.vuejs.org/core-plugins/e2e-cypress.html).
 
 ```json
 {
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "dev": "NODE_ENV=test start-test serve 8080 cy:open",
-    "cy:open": "cypress open"
+    "test:e2e": "NODE_ENV=test vue-cli-service test:e2e"
   }
 }
 ```
 
-We can place our first end-to-end spec file in `cypress/integration` folder
+We can place our first end-to-end spec file in `tests/e2e/integration` folder
 
 ```js
 /// <reference types="cypress" />
@@ -190,7 +177,7 @@ describe('Calculator', () => {
 })
 ```
 
-Locally, I will use `npm run dev` command to start the application and open Cypress. The above test passes quickly. Our calculator seems to add and divide numbers just fine.
+Locally, I will use `npm run test:e2e` command to start the application and open Cypress. The above test passes quickly. Our calculator seems to add and divide numbers just fine.
 
 ![Calculator test](./images/calculator.gif)
 

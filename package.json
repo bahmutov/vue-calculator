@@ -2,16 +2,18 @@
   "name": "vue-calculator",
   "version": "1.0.0",
   "private": true,
+  "description": "Super simple calculator made with Vue.js",
+  "author": "Kyle Butler",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:e2e": "NODE_ENV=test vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "start": "node server.js",
-    "dev": "NODE_ENV=test start-test serve 8080 cy:open",
-    "ci": "NODE_ENV=test start-test serve 8080 cy:run",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run",
+    "start": "node server.js"
   },
+  "main": "server.js",
   "dependencies": {
     "core-js": "^2.6.5",
     "express": "^4.16.4",
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "3.8.1",
     "@vue/cli-plugin-babel": "^3.6.0",
+    "@vue/cli-plugin-e2e-cypress": "4.4.6",
     "@vue/cli-plugin-eslint": "^3.6.0",
     "@vue/cli-service": "^3.6.0",
     "babel-eslint": "^10.0.1",
@@ -28,9 +31,6 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "vue-template-compiler": "^2.5.21"
-  },
-  "engines": {
-    "node": "10.13.0"
   },
   "eslintConfig": {
     "root": true,
@@ -56,16 +56,16 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "description": "Super simple calculator made with Vue.js",
-  "main": "server.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kylbutlr/vue-calculator.git"
-  },
-  "author": "Kyle Butler",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kylbutlr/vue-calculator/issues"
   },
-  "homepage": "https://github.com/kylbutlr/vue-calculator#readme"
+  "engines": {
+    "node": "10.13.0"
+  },
+  "homepage": "https://github.com/kylbutlr/vue-calculator#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kylbutlr/vue-calculator.git"
+  }
 }
