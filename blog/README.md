@@ -4,11 +4,11 @@ authorTwitter: @bahmutov
 tags: vue.js, code coverage
 ---
 
-Let's take a Vue application scaffolded with [Vue CLI](https://cli.vuejs.org/) like this [vue-calculator](https://github.com/bahmutov/vue-calculator) app. In this blog post, I will show how to instrument the application's source code to collect the code coverage information. We then will use the code coverage reports to guide the end-to-end test writing.
+Let's take a Vue application scaffolded with [Vue CLI](https://cli.vuejs.org/) like this [bahmutov/vue-calculator](https://github.com/bahmutov/vue-calculator) app. In this blog post, I will show how to instrument the application's source code to collect the code coverage information. We then will use the code coverage reports to guide the end-to-end test writing.
 
 ## The application
 
-The example application was forked from [kylbutlr/vue-calculator](https://github.com/kylbutlr/vue-calculator) which used Vue CLI default template during scaffolding. The code is transformed using the following `babel.config.js` file:
+The example application can be found in [bahmutov/vue-calculator](https://github.com/bahmutov/vue-calculator) repo that was forked from [kylbutlr/vue-calculator](https://github.com/kylbutlr/vue-calculator) which used Vue CLI default template during scaffolding. The code is transformed using the following `babel.config.js` file:
 
 ```js
 // babel.config.js
